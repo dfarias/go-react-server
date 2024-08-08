@@ -3,14 +3,29 @@ services:
     image: postgres:latest
     restart: unless-stopped
     ports:
-      - ${LOCAL_DB_PORT}:5432
+      - ${LOCAL_DB_PORT:-5432}:5432
     environment:
       POSTGRES_USER: ${LOCAL_DB_USER}
       POSTGRES_PASSWORD: ${LOCAL_DB_PASS}
-      PORTGRES_DB: ${LOCAL_DB_NAME}
+      POSTGRES_DB: ${LOCAL_DB_NAME}
     volumes:
       - db:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - 8081:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
 volumes:
   db:
+    driver: local
+  pgadmin:
     driver: local
